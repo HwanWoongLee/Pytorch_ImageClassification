@@ -1,13 +1,13 @@
-from model.AlexNet import QAlexNet
-from model.VGGNet import QVGGNet
-from model.ResNet import QResNet
-
-import torchvision.models.resnet as ResNet
-
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import torch
 import numpy as np
+
+from model.AlexNet import QAlexNet
+from model.VGGNet import QVGGNet
+from model.ResNet import QResNet34, QResNet152
+import GraphView
+
 
 # parameter
 num_classes = 2
@@ -35,7 +35,7 @@ test_dataloader = DataLoader(dataset=test_datasets, batch_size=batch_size, shuff
 
 
 # load model
-model = QVGGNet(num_classes=num_classes)
+model = QResNet152(num_classes=num_classes)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model.to(device)
 
@@ -47,6 +47,9 @@ loss_func = torch.nn.CrossEntropyLoss()
 
 
 # training
+loss_mean_arr = []
+val_loss_mean_arr = []
+
 for epoch in range(num_epoch):
     model.train()
     loss_arr = []
@@ -73,6 +76,8 @@ for epoch in range(num_epoch):
     print('epoch [{}/{}] | loss mean : {:.4f}'.format(
         epoch, num_epoch, np.mean(loss_arr)))
 
+    loss_mean_arr.append(np.mean(loss_arr))
+
     model.eval()
     with torch.no_grad():
         val_loss_arr = []
@@ -88,6 +93,11 @@ for epoch in range(num_epoch):
 
         print('epoch [{}/{}] | val loss mean : {:.4f}'.format(
             epoch, num_epoch, np.mean(val_loss_arr)))
+
+        val_loss_mean_arr.append(np.mean(val_loss_arr))
+
+
+GraphView.draw_graph(range(num_epoch), loss_mean_arr, val_loss_mean_arr)
 
 # model save
 torch.save(model, '../backup/new_model.pth')
