@@ -11,13 +11,20 @@ class QGradCAM(nn.Module):
         super(QGradCAM, self).__init__()
 
         self.model = model
-        self.target_layer = target_layer
+        self.target_layer = None
+
+        for name, layer in model.named_modules():
+            if name == target_layer:
+                self.target_layer = layer
+
+        if not self.target_layer:
+            print('target layer is None')
 
         self.forward_result = None
         self.backward_result = None
 
-        self.model.conv5_x.register_forward_hook(self.forward_hook)
-        self.model.conv5_x.register_backward_hook(self.backward_hook)
+        self.target_layer.register_forward_hook(self.forward_hook)
+        self.target_layer.register_backward_hook(self.backward_hook)
 
     def forward(self, x):
         return self.model.forward(x)
