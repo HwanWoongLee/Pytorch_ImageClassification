@@ -49,3 +49,17 @@ model.to(device)
 ![train_graph](https://user-images.githubusercontent.com/20108771/131287567-fcf0fafd-d2b8-4e14-8ab1-8feb72089692.png)
 
 
+### 4. Grad-CAM
+```
+# Grad-CAM
+from GradCAM import GetGradCAMModule
+
+gc_model = GetGradCAMModule(load_model, 'conv5_x')
+gc_model.eval()
+```
+- GetGradCAMModule(model, target_layer)
+- model : base CNN model
+- target_layer : layer to visualize with GradCAM
+
+![9](https://user-images.githubusercontent.com/20108771/134663031-ca5fd56f-62ac-400f-ac3a-4e7274e94523.png)
+![45](https://user-images.githubusercontent.com/20108771/134663078-e111b514-79c4-4299-ac66-f2e945b06118.png)
